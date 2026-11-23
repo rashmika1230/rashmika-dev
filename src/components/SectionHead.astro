@@ -1,0 +1,39 @@
+---
+/** Section heading row: big title with an italic accent, plus a short intro. */
+interface Props {
+  title: string;
+  accent: string;
+  intro: string;
+  id?: string;
+}
+
+const { title, accent, intro, id } = Astro.props;
+---
+
+<div class="head">
+  <h2 id={id}>{title} <em>{accent}</em></h2>
+  <p>{intro}</p>
+</div>
+
+<style>
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 24px 64px;
+    align-items: end;
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+
+  p {
+    margin: 0;
+    color: var(--g);
+    font-size: 17px;
+    max-width: 38em;
+  }
+
+  @media (max-width: 860px) {
+    .head {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

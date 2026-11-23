@@ -1,0 +1,156 @@
+---
+import { projects, scrollerLabels, workSection } from '../data/projects';
+import ProjectCard from './ProjectCard.astro';
+import SectionHead from './SectionHead.astro';
+---
+
+<section class="band inv" id="work" aria-labelledby="work-title">
+  <div class="wrap" data-scroller>
+    <SectionHead id="work-title" {...workSection} />
+
+    <div class="controls">
+      <div class="bar" aria-hidden="true"><span class="thumb" data-thumb></span></div>
+      <button class="nav" type="button" aria-label={scrollerLabels.prev} aria-controls="work-track" data-prev>
+        <span aria-hidden="true">←</span>
+      </button>
+      <button class="nav" type="button" aria-label={scrollerLabels.next} aria-controls="work-track" data-next>
+        <span aria-hidden="true">→</span>
+      </button>
+    </div>
+
+    <div
+      class="track reveal"
+      id="work-track"
+      tabindex="0"
+      role="region"
+      aria-label={scrollerLabels.region}
+      data-track
+    >
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initProjectScroller } from '../scripts/projectScroller';
+
+  document.querySelectorAll<HTMLElement>('[data-scroller]').forEach(initProjectScroller);
+</script>
+
+<style>
+  /* Progress bar + prev/next buttons, between the heading and the track */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: clamp(24px, 3vw, 36px);
+  }
+
+  .bar {
+    position: relative;
+    flex: 1;
+    height: 2px;
+    margin-right: 12px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .thumb {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 40%;
+    background: var(--k);
+    border-radius: 2px;
+  }
+
+  .nav {
+    flex: none;
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--k);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--k);
+    font: inherit;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.25s, border-color 0.25s, opacity 0.25s;
+  }
+
+  .nav:hover:not(:disabled) {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .nav:focus-visible {
+    outline: 2px solid var(--k);
+    outline-offset: 3px;
+  }
+
+  .nav:disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  /* Track: one row of cards, scroll-snapped, scrollbar hidden.
+     The 8px padding (cancelled by the negative margin) keeps card focus rings from being clipped. */
+  .track {
+    --gap: clamp(20px, 3vw, 36px);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - var(--gap)) / 2);
+    gap: var(--gap);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 8px;
+    scrollbar-width: none;
+    padding: 8px;
+    margin: -8px;
+    border-radius: 12px;
+  }
+
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .track:focus-visible {
+    outline: 2px solid var(--k);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .track {
+      cursor: grab;
+    }
+  }
+
+  /* While mouse-dragging: no snapping (it fights the drag) and no text selection. */
+  .track:global(.is-dragging) {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    user-select: none;
+  }
+
+  .track:global(.is-dragging) :global(a) {
+    cursor: grabbing;
+  }
+
+  @media (max-width: 860px) {
+    .track {
+      grid-auto-columns: 86%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .nav {
+      width: 44px;
+      height: 44px;
+      font-size: 18px;
+    }
+  }
+</style>

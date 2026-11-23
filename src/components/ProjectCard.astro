@@ -1,0 +1,333 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { demoLabel, featuredLabel, type Project } from '../data/projects';
+import ProjectArt from './ProjectArt.astro';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+
+// Any image dropped into src/assets/projects/ is picked up here; a missing file
+// falls back to the sample illustration instead of failing the build.
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/projects/*.{webp,png,jpg,jpeg,avif}',
+  { eager: true },
+);
+const image = project.image ? images[`../assets/projects/${project.image.src}`]?.default : undefined;
+const featured = project.featured === true;
+// Cards are half the track on desktop and 86% of it under 860px.
+const sizes = '(max-width: 860px) 86vw, 600px';
+---
+
+<!--
+  The whole card is clickable via a "stretched" title link (its ::after covers the card),
+  which keeps the optional live-demo link valid HTML instead of a link inside a link.
+-->
+<article class="proj">
+  <div class="shot">
+    {
+      image && project.image ? (
+        <Image
+          src={image}
+          alt={project.image.alt}
+          widths={[480, 720, 960, 1280]}
+          sizes={sizes}
+          loading="lazy"
+          decoding="async"
+          draggable="false"
+        />
+      ) : (
+        <Fragment>
+          <ProjectArt name={project.art} />
+          <span class="sample" aria-hidden="true">Sample image</span>
+        </Fragment>
+      )
+    }
+  </div>
+  <div class="body">
+    <div class="meta">
+      <span class="when">
+        <span class="yr">{project.year}</span>
+        {
+          featured && (
+            <span class="latest">
+              <i aria-hidden="true" />
+              {featuredLabel}
+            </span>
+          )
+        }
+      </span>
+      <span class="actions">
+        {
+          project.demoUrl && (
+            <a class="demo" href={project.demoUrl}>
+              {demoLabel}
+              <span aria-hidden="true"> ↗</span>
+              <span class="sr-only">: {project.title}{project.titleAccent}</span>
+            </a>
+          )
+        }
+        <span class="arrow" aria-hidden="true">→</span>
+      </span>
+    </div>
+    <div class="heading">
+      {project.subtitle && <p class="sub">{project.subtitle}</p>}
+      <h3>
+        <a class="proj-link" href={project.repoUrl}>
+          {project.title}<em>{project.titleAccent}</em><span class="sr-only"> — view source</span>
+        </a>
+      </h3>
+    </div>
+    <p>{project.description}</p>
+    <ul class="tags" aria-label="Technologies">
+      {project.tags.map((tag) => <li>{tag}</li>)}
+      {
+        project.liveUrl && (
+          <li class="live">
+            <a href={project.liveUrl}>
+              Live<span aria-hidden="true"> ↗</span>
+              <span class="sr-only"> demo of {project.title}{project.titleAccent}</span>
+            </a>
+          </li>
+        )
+      }
+    </ul>
+  </div>
+</article>
+
+<style>
+  .proj {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-radius: 22px;
+    scroll-snap-align: start;
+  }
+
+  .shot {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--k);
+  }
+
+  /* The image/SVG comes from child components, so target it with :global(). */
+  .shot :global(svg),
+  .shot :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .proj:hover .shot :global(svg),
+  .proj:hover .shot :global(img) {
+    transform: scale(1.04);
+  }
+
+  .sample {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    font-size: 12px;
+    color: #bdbdbd;
+    background: rgba(10, 10, 10, 0.7);
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .heading {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .proj .sub {
+    font-size: 14px;
+    color: var(--g);
+  }
+
+  .actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* "Watch demo ↗": sits above the stretched card link so it stays separately clickable. */
+  .demo {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid var(--k);
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.25s, color 0.25s;
+  }
+
+  .demo:hover {
+    background: var(--k);
+    color: var(--w);
+  }
+
+  .demo:focus-visible {
+    outline: 2px solid var(--k);
+    outline-offset: 3px;
+  }
+
+  .when {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* "Latest" pill: same style as the hero status pill. */
+  .latest {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--g);
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    border-radius: 99px;
+  }
+
+  .latest i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .yr {
+    color: var(--g);
+    font-size: 14px;
+  }
+
+  h3 {
+    font-size: clamp(26px, 3vw, 38px);
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    margin: 0;
+    font-weight: 800;
+  }
+
+  h3 em {
+    font-weight: 400;
+  }
+
+  .proj-link {
+    text-decoration: none;
+  }
+
+  .proj-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+  }
+
+  .proj-link:focus-visible {
+    outline: none;
+  }
+
+  .proj-link:focus-visible::after {
+    outline: 2px solid var(--k);
+    outline-offset: 6px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--g);
+    font-size: 15px;
+    max-width: 44ch;
+  }
+
+  .arrow {
+    width: 48px;
+    height: 48px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+    transition: background 0.25s, border-color 0.25s, color 0.25s, transform 0.3s;
+  }
+
+  .proj:hover .arrow,
+  .proj:focus-within .arrow {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--k);
+    transform: rotate(-45deg);
+  }
+
+  /* Sits above the stretched card link so it stays separately clickable. */
+  .proj .live {
+    position: relative;
+    z-index: 1;
+    padding: 0;
+  }
+
+  .live a {
+    position: relative;
+    display: inline-block;
+    padding: 3px 10px;
+    text-decoration: none;
+  }
+
+  /* Grow the tap area to 44px without changing the pill's size. */
+  .live a::before {
+    content: '';
+    position: absolute;
+    inset: -11px -4px;
+  }
+
+  .live a:focus-visible {
+    outline: 2px solid var(--k);
+    outline-offset: 2px;
+    border-radius: 99px;
+  }
+
+  @media (max-width: 600px) {
+    .arrow {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .proj:hover .shot :global(svg),
+    .proj:hover .shot :global(img) {
+      transform: none;
+    }
+  }
+</style>

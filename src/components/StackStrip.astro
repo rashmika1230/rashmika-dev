@@ -1,0 +1,65 @@
+---
+import { profile } from '../data/profile';
+import TechLogo from './TechLogo.astro';
+---
+
+<div class="strip">
+  <ul class="wrap" aria-label="Core stack">
+    {
+      profile.stack.map((tech) => (
+        <li class="tech">
+          <TechLogo name={tech.icon} class="tech-logo" />
+          {tech.name}
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .strip {
+    border-block: 1px solid var(--line);
+    padding: 22px var(--gutter);
+  }
+
+  /* Ten items: two even rows of five, spread edge to edge (instead of a wrap that leaves 2 stragglers). */
+  .wrap {
+    display: grid;
+    grid-template-columns: repeat(5, auto);
+    gap: 16px clamp(20px, 2.5vw, 34px);
+    justify-content: space-between;
+    font-size: clamp(16px, 1.7vw, 20px);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+  }
+
+  .tech {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #cfcfcf;
+    transition: color 0.25s;
+  }
+
+  .tech:hover {
+    color: var(--accent);
+  }
+
+  /* The SVG is injected with set:html, so it can't carry this component's scope. */
+  .tech :global(.tech-logo) {
+    width: 26px;
+    height: 26px;
+    flex: none;
+  }
+
+  @media (max-width: 600px) {
+    .wrap {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+  }
+</style>

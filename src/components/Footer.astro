@@ -1,0 +1,23 @@
+---
+import { profile } from '../data/profile';
+---
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 {profile.fullName}</span>
+  </div>
+</footer>
+
+<style>
+  footer {
+    padding: 28px var(--gutter);
+    color: var(--g);
+    font-size: 13px;
+  }
+
+  .wrap {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+</style>

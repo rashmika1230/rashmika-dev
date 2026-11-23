@@ -1,0 +1,144 @@
+---
+import { profile } from '../data/profile';
+---
+
+<nav aria-label="Main" data-nav>
+  <div class="wrap">
+    <a class="logo" href="#top">{profile.logo.text}<span>{profile.logo.accent}</span></a>
+    <button class="menu" type="button" aria-expanded="false" aria-controls="nav-links" data-menu>
+      <span data-menu-label>Menu</span>
+    </button>
+    <div class="links" id="nav-links">
+      {profile.nav.map((link) => <a href={link.href}>{link.label}</a>)}
+    </div>
+  </div>
+</nav>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const button = nav?.querySelector<HTMLButtonElement>('[data-menu]');
+  const label = nav?.querySelector<HTMLElement>('[data-menu-label]');
+
+  if (nav && button && label) {
+    const setOpen = (open: boolean) => {
+      nav.toggleAttribute('data-open', open);
+      button.setAttribute('aria-expanded', String(open));
+      label.textContent = open ? 'Close' : 'Menu';
+    };
+
+    button.addEventListener('click', () => setOpen(!nav.hasAttribute('data-open')));
+    nav.querySelectorAll('.links a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.hasAttribute('data-open')) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+    // Close if the viewport grows past the mobile breakpoint while open.
+    matchMedia('(min-width: 601px)').addEventListener('change', (e) => e.matches && setOpen(false));
+  }
+</script>
+
+<style>
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(10, 10, 10, 0.82);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px var(--gutter);
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .logo span {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .links {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .links a,
+  .menu {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+    font-size: 14px;
+    color: var(--g);
+    padding: 10px 12px;
+    border-radius: 99px;
+    transition: color 0.2s, background 0.2s;
+  }
+
+  .links a:hover,
+  .links a:focus-visible,
+  .menu:hover,
+  .menu:focus-visible {
+    color: var(--k);
+    background: var(--w);
+    outline: none;
+  }
+
+  .menu {
+    display: none;
+    font: inherit;
+    font-size: 14px;
+    background: none;
+    border: 1px solid var(--line);
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+
+  /* Mobile: collapse links behind the menu button (only when JS can open it). */
+  @media (max-width: 600px) {
+    :global(.js) .menu {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    :global(.js) .links {
+      display: none;
+    }
+
+    :global(.js) nav[data-open] .links {
+      display: flex;
+      flex-direction: column;
+      flex-basis: 100%;
+      gap: 2px;
+      padding-bottom: 6px;
+    }
+
+    .links a {
+      padding: 10px 8px;
+    }
+
+    :global(.js) nav[data-open] .links a {
+      padding: 12px 16px;
+      font-size: 16px;
+    }
+  }
+</style>

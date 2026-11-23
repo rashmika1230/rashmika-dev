@@ -1,0 +1,36 @@
+---
+/**
+ * Inline monochrome tech logo from src/assets/icons/<name>.svg.
+ * Every icon file uses fill="currentColor", so the logo takes the text colour
+ * of its parent. Logos are decorative (aria-hidden): the visible name is the label.
+ */
+import type { TechIcon } from '../data/profile';
+
+interface Props {
+  name: TechIcon;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 26, class: className } = Astro.props;
+
+const icons = import.meta.glob<string>('../assets/icons/*.svg', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
+const raw = icons[`../assets/icons/${name}.svg`];
+if (!raw) throw new Error(`TechLogo: no icon file src/assets/icons/${name}.svg`);
+
+// Drop the credit/TODO comment and add size + a11y attributes to the root <svg>.
+const svg = raw
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .trim()
+  .replace(
+    /^<svg\b/,
+    `<svg width="${size}" height="${size}" aria-hidden="true" focusable="false"${className ? ` class="${className}"` : ''}`,
+  );
+---
+
+<Fragment set:html={svg} />

@@ -1,0 +1,65 @@
+---
+import { journey, journeySection } from '../data/journey';
+import SectionHead from './SectionHead.astro';
+---
+
+<section class="band" id="journey" aria-labelledby="journey-title">
+  <div class="wrap">
+    <SectionHead id="journey-title" {...journeySection} />
+    <ol class="tl">
+      {
+        journey.map((step) => (
+          <li class="card reveal">
+            <span class="when">{step.when}</span>
+            <h3>{step.title}</h3>
+            <p>{step.description}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .tl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .when {
+    font-size: 14px;
+    color: var(--g);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: 0;
+    color: var(--g);
+    font-size: 15px;
+  }
+
+  @media (max-width: 980px) {
+    .tl {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

@@ -1,0 +1,228 @@
+---
+/**
+ * Sample line-drawn illustrations from design-reference.html, used as project
+ * card images until real screenshots are added to src/assets/projects/.
+ * Accent strokes/fills animate like the hero diagram's data flow.
+ */
+import type { ProjectArtName } from '../data/projects';
+
+interface Props {
+  name?: ProjectArtName;
+}
+
+const { name } = Astro.props;
+
+const W = '#fafafa';
+const K = '#0a0a0a';
+const gridX = Array.from({ length: 12 }, (_, i) => i * 36);
+const gridY = Array.from({ length: 7 }, (_, i) => i * 36);
+
+const orderXs = [70, 200, 330];
+const orderBoxes = [
+  { x: 20, label: 'Products' },
+  { x: 150, label: 'Orders' },
+  { x: 280, label: 'Inventory' },
+];
+const towers: [number, number, number][] = [
+  [20, 120, 50],
+  [78, 80, 44],
+  [130, 140, 40],
+  [178, 60, 56],
+  [242, 110, 46],
+  [296, 130, 40],
+  [344, 96, 40],
+];
+const windows: [number, number][] = [
+  [90, 96],
+  [90, 116],
+  [104, 136],
+  [190, 80],
+  [206, 100],
+  [190, 140],
+  [222, 120],
+  [256, 130],
+  [256, 160],
+  [356, 112],
+  [356, 150],
+];
+const pins = [0, 1, 2, 3, 4];
+---
+
+<svg viewBox="0 0 400 250" font-family="Inter Tight, sans-serif" aria-hidden="true" focusable="false">
+  <rect width="400" height="250" fill={K}></rect>
+  <g fill="none" stroke={W} stroke-opacity=".05">
+    {gridX.map((x) => <path d={`M${x} 0V250`} />)}
+    {gridY.map((y) => <path d={`M0 ${y}H400`} />)}
+  </g>
+
+  {
+    name === 'whatsapp-agent' && (
+      <g>
+        {/* Phone and first flow node start low enough that the "Sample image" pill (top-right) never covers them. */}
+        <rect x="36" y="44" width="128" height="192" rx="18" fill={K} stroke={W} stroke-width="1.4" />
+        <circle cx="56" cy="61" r="6" fill="none" stroke={W} stroke-opacity=".6" />
+        <text x="68" y="65" font-size="11" fill={W} fill-opacity=".7">Your shop</text>
+        <path d="M36 76H164" stroke={W} stroke-opacity=".25" />
+
+        {/* Chat: customer (outline, left), agent replies (accent, right) */}
+        <rect x="48" y="86" width="58" height="24" rx="10" fill="none" stroke={W} stroke-width="1.4" />
+        <text x="58" y="102" font-size="12" fill={W}>Price?</text>
+        <rect x="72" y="120" width="84" height="24" rx="10" class="acc-fill" />
+        <text x="114" y="136" font-size="11" text-anchor="middle" fill={K} font-weight="600">Rs. 2,500 ✓</text>
+        <rect x="52" y="154" width="104" height="24" rx="10" class="acc-fill" />
+        <text x="104" y="170" font-size="11" text-anchor="middle" fill={K} font-weight="600">Order confirmed</text>
+        <rect x="48" y="206" width="104" height="18" rx="9" fill="none" stroke={W} stroke-opacity=".35" />
+
+        {/* Animated connectors: phone → WhatsApp → AI Agent → Sheets, and the reply back to the phone */}
+        <g fill="none" class="acc-stroke" stroke-width="1.6">
+          <path class="flow" d="M168 75H232" />
+          <path class="flow" d="M300 92V120" />
+          <path class="flow" d="M300 154V196" />
+          <path class="flow" d="M232 137H172" />
+        </g>
+        <path d="M178 131l-6 6 6 6" fill="none" class="acc-stroke" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+
+        {/* Flow nodes */}
+        <rect x="232" y="58" width="136" height="34" rx="10" fill={K} stroke={W} stroke-width="1.4" />
+        <path
+          d="M250 68h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7l-4 3v-3h-1a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z"
+          fill="none"
+          stroke={W}
+          stroke-width="1.4"
+          stroke-linejoin="round"
+        />
+        <text x="274" y="79" font-size="12" fill={W}>WhatsApp</text>
+
+        <rect x="232" y="120" width="136" height="34" rx="10" fill={W} stroke={W} stroke-width="1.4" />
+        <text x="300" y="141" font-size="12" text-anchor="middle" fill={K} font-weight="600">AI Agent · Gemini</text>
+
+        <rect x="232" y="196" width="136" height="34" rx="10" fill={K} stroke={W} stroke-width="1.4" />
+        <g fill="none" stroke={W} stroke-width="1.3">
+          <rect x="248" y="206" width="14" height="14" rx="2" />
+          <path d="M248 211h14M248 215.5h14M253 206v14" />
+        </g>
+        <text x="274" y="217" font-size="12" fill={W}>Google Sheets</text>
+      </g>
+    )
+  }
+
+  {
+    name === 'order' && (
+      <g>
+        <g class="acc-stroke" stroke-width="1.6">
+          {orderXs.map((x) => <path class="flow" d={`M200 92V122H${x}V150`} />)}
+        </g>
+        <rect x="140" y="48" width="120" height="44" rx="8" fill={W} stroke={W} stroke-width="1.4" />
+        <text x="200" y="74" text-anchor="middle" font-size="12" fill={K}>API gateway</text>
+        {orderBoxes.map(({ x, label }) => (
+          <g>
+            <rect x={x} y="150" width="100" height="44" rx="8" fill={K} stroke={W} stroke-width="1.4" />
+            <text x={x + 50} y="176" text-anchor="middle" font-size="12" fill={W}>{label}</text>
+          </g>
+        ))}
+        <g fill="none" stroke={W} stroke-opacity=".5">
+          {orderXs.map((x) => (
+            <g>
+              <path d={`M${x} 194V214`} />
+              <ellipse cx={x} cy="220" rx="18" ry="5" />
+            </g>
+          ))}
+        </g>
+      </g>
+    )
+  }
+
+  {
+    name === 'trade' && (
+      <g>
+        <circle cx="150" cy="128" r="84" fill="none" stroke={W} stroke-width="1.4" />
+        <g fill="none" stroke={W} stroke-opacity=".35">
+          <ellipse cx="150" cy="128" rx="28" ry="84" />
+          <ellipse cx="150" cy="128" rx="56" ry="84" />
+          <path d="M66 128H234M80 86H220M80 170H220" />
+        </g>
+        <g fill="none" class="acc-stroke" stroke-width="1.8">
+          <path class="flow" d="M110 100Q170 40 200 110" />
+          <path class="flow" d="M200 110Q290 150 330 120" />
+        </g>
+        <g class="acc-fill">
+          <circle cx="110" cy="100" r="5" />
+          <circle cx="200" cy="110" r="5" />
+          <circle cx="330" cy="120" r="5" />
+        </g>
+        <g fill={K} stroke={W} stroke-width="1.3">
+          {[0, 1, 2].map((i) => <rect x={290 + i * 30} y="178" width="28" height="22" rx="2" />)}
+          <rect x="305" y="155" width="28" height="22" rx="2" />
+        </g>
+      </g>
+    )
+  }
+
+  {
+    name === 'city' && (
+      <g>
+        <circle cx="300" cy="70" r="30" fill="none" class="acc-stroke" stroke-width="1.8" />
+        <text x="300" y="75" text-anchor="middle" font-size="13" font-weight="700" class="acc-fill">360</text>
+        <g fill={K} stroke={W} stroke-width="1.3">
+          {towers.map(([x, y, w]) => <rect x={x} y={y} width={w} height={226 - y} />)}
+        </g>
+        <g fill={W} fill-opacity=".55">
+          {windows.map(([x, y]) => <rect x={x} y={y} width="8" height="10" />)}
+        </g>
+        <path d="M0 226H400" stroke={W} stroke-width="1.4" />
+      </g>
+    )
+  }
+
+  {
+    name === 'access' && (
+      <g>
+        <rect x="70" y="60" width="130" height="130" rx="12" fill={K} stroke={W} stroke-width="1.4" />
+        <rect x="100" y="90" width="70" height="70" rx="6" fill="none" stroke={W} stroke-opacity=".5" />
+        <text x="135" y="130" text-anchor="middle" font-size="12" fill={W}>ESP32</text>
+        <g stroke={W} stroke-opacity=".6">
+          {pins.map((i) => (
+            <path
+              d={`M${88 + i * 24} 60V44M${88 + i * 24} 190V206M70 ${78 + i * 24}H54M200 ${78 + i * 24}H216`}
+            />
+          ))}
+        </g>
+        <g fill="none" class="acc-stroke" stroke-width="2">
+          <path d="M246 112q14-14 0-28" />
+          <path d="M256 122q26-24 0-48" />
+        </g>
+        <path d="M296 118v-22a26 26 0 0 1 52 0v22" fill="none" stroke={W} stroke-width="2" />
+        <rect x="284" y="118" width="76" height="62" rx="10" fill={W} />
+        <circle cx="322" cy="144" r="7" class="acc-fill" />
+        <path d="M322 150v12" class="acc-stroke" stroke-width="3" />
+      </g>
+    )
+  }
+</svg>
+
+<style>
+  .acc-stroke {
+    stroke: var(--accent);
+  }
+
+  .acc-fill {
+    fill: var(--accent);
+  }
+
+  .flow {
+    stroke-dasharray: 6 8;
+    animation: illo-flow 1.6s linear infinite;
+  }
+
+  @keyframes illo-flow {
+    to {
+      stroke-dashoffset: -28;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flow {
+      animation: none;
+    }
+  }
+</style>
